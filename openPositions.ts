@@ -1,7 +1,6 @@
 import { AccountApi, ApiKeyAuthentication, IsomorphicFetchHttpLibrary, OrderApi, ServerConfiguration } from "./lighter-sdk-ts/generated";
 
 const BASE_URL = "https://mainnet.zklighter.elliot.ai"
-import { ACCOUNT_INDEX } from "./config";
 
 export async function getOpenPositions(apiKey: string, accountIndex: string) {
     const accountApi = new AccountApi({
