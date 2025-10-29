@@ -20,7 +20,7 @@ export async function cancelAllOrders(account: Account) {
         middleware: [],
         authMethods: {}
     }); 
-    const openPositions = await getOpenPositions(account.apiKey);
+    const openPositions = await getOpenPositions(account.apiKey, account.accountIndex);
     openPositions?.forEach(async ({position, sign, symbol}) => {
         if (Number(position) != 0) {
             const candleStickData = await candleStickApi.candlesticks(MARKETS[symbol as keyof typeof MARKETS].marketId, '1m', Date.now() - 1000 * 60 * 5, Date.now(), 1, false);

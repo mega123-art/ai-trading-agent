@@ -39,7 +39,7 @@ export const invokeAgent = async (account: Account) => {
   
   const portfolio = await getPortfolio(account);
 
-  const openPositions = await getOpenPositions(account.apiKey);
+  const openPositions = await getOpenPositions(account.apiKey, account.accountIndex);
   const modelInvocation = await prisma.invocations.create({
     data: {
       modelId: account.id,

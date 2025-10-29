@@ -2,7 +2,7 @@ import { NonceManagerType } from "./lighter-sdk-ts/nonce_manager";
 import { SignerClient } from "./lighter-sdk-ts/signer";
 import { AccountApi, ApiKeyAuthentication, IsomorphicFetchHttpLibrary, OrderApi, ServerConfiguration } from "./lighter-sdk-ts/generated";
 import type { Account } from "./accounts";
-import { ACCOUNT_INDEX, API_KEY_INDEX, BASE_URL } from "./config";
+import { API_KEY_INDEX, BASE_URL } from "./config";
 import { MARKETS } from "./markets";
 import { CandlestickApi, MarketInfo } from "./lighter-sdk-ts/generated";
 
@@ -11,7 +11,7 @@ export async function createPosition(account: Account, symbol: string, side: "LO
         url: BASE_URL,
         privateKey: account.apiKey,
         apiKeyIndex: API_KEY_INDEX,
-        accountIndex: ACCOUNT_INDEX,
+        accountIndex: Number(account.accountIndex),
         nonceManagementType: NonceManagerType.API
     });
 

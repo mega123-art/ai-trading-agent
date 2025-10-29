@@ -3,7 +3,7 @@ import { AccountApi, ApiKeyAuthentication, IsomorphicFetchHttpLibrary, OrderApi,
 const BASE_URL = "https://mainnet.zklighter.elliot.ai"
 import { ACCOUNT_INDEX } from "./config";
 
-export async function getOpenPositions(apiKey: string) {
+export async function getOpenPositions(apiKey: string, accountIndex: string) {
     const accountApi = new AccountApi({
         baseServer: new ServerConfiguration<{  }>(BASE_URL, {  }),
         httpApi: new IsomorphicFetchHttpLibrary(),
@@ -15,7 +15,7 @@ export async function getOpenPositions(apiKey: string) {
 
     const currentOpenOrders = await accountApi.accountWithHttpInfo(
         'index',
-        ACCOUNT_INDEX.toString()
+        accountIndex
     );
 
     return currentOpenOrders.data.accounts[0]?.positions.map((accountPosition) => ({
