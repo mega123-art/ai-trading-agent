@@ -99,6 +99,10 @@ export const invokeAgent = async (account: Account) => {
   });
 
   await response.consumeStream();
+  await prisma.models.update({
+    where: { id: account.id },
+    data: { invocationCount: { increment: 1 } },
+  });
   await prisma.invocations.update({
     where: { id: modelInvocation.id },
     data: { response: (await response.text).trim() },
