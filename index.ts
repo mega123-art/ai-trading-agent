@@ -15,7 +15,7 @@ const prisma = new PrismaClient();
 // --- START: NEW DYNAMIC SIZING LOGIC ---
 
 // Define the maximum percentage of available capital to allocate at 1.0 confidence.
-// This sets your maximum risk per trade. (e.g., 20% of available cash)
+// 0.20 means a max of 20% of available cash is used for any single trade.
 const MAX_TRADE_ALLOCATION_PERCENT = 0.20; 
 
 /**
@@ -25,7 +25,7 @@ const MAX_TRADE_ALLOCATION_PERCENT = 0.20;
  * @returns The dollar amount to allocate to the trade.
  */
 const calculateTradeSize = (availableCash: number, confidence: number): number => {
-    // Ensure confidence is clamped between 0.0 and 1.0 for safety and to prevent over-allocation
+    // Ensure confidence is clamped between 0.0 and 1.0 for safety
     const clampedConfidence = Math.max(0.0, Math.min(1.0, confidence));
 
     // Calculate maximum dollar amount to allocate (Max risk per trade)
@@ -104,10 +104,7 @@ export const invokeAgent = async (account: Account) => {
           // Calculate the dollar amount to trade based on available cash and confidence
           const tradeAmountDollars = calculateTradeSize(availableCash, confidence);
 
-          // NOTE: We pass the calculated dollar amount as 'quantity' here, 
-          // assuming your 'createPosition' function is updated separately 
-          // (in createPosition.ts) to interpret this as a notional dollar amount 
-          // and calculate the true unit quantity using the current market price.
+          // We pass the dollar amount. createPosition.ts will convert this to units.
           const quantityToTrade = tradeAmountDollars; 
           
           console.log(`[Trade Sizing] Calculated size: $${tradeAmountDollars.toFixed(2)} based on confidence: ${confidence}`);
