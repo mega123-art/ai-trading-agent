@@ -1,31 +1,44 @@
 import { useEffect, useState } from "react";
 import PerformanceChart from "./components/PerformanceChart";
 import RecentInvocations from "./components/RecentInvocations";
+import Navbar from "./components/Navbar";
 
-const BACKEND_URL = "http://localhost:3000";
+const BACKEND_URL = "https://api.ai-trading.100xdevs.com";
 
 function ChartSkeleton() {
   return (
-    <div className="lg:col-span-2 bg-white shadow-sm rounded-3xl p-6 border border-gray-100">
-      <div className="h-6 w-1/3 rounded-md bg-gray-200 animate-pulse mb-4" />
-      <div className="w-full h-[56vh] rounded-2xl bg-gradient-to-r from-gray-100 to-gray-50 animate-pulse" />
+    <div className="relative w-full flex flex-1 border-r-2 border-black">
+      <div className="absolute left-1/2 top-2 -translate-x-1/2 z-10">
+        <div className="h-4 w-48 rounded bg-gray-300 animate-pulse" />
+      </div>
+      <div className="w-full h-full flex items-center justify-center p-8">
+        <div className="w-full h-full rounded bg-linear-to-br from-gray-100 to-gray-200 animate-pulse" />
+      </div>
     </div>
   );
 }
 
 function ListSkeleton() {
   return (
-    <div className="bg-white shadow-sm rounded-3xl p-6 border border-gray-100">
-      <div className="h-6 w-1/2 rounded-md bg-gray-200 animate-pulse mb-4" />
-      <div className="space-y-4 overflow-hidden">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="p-4 rounded-lg border border-gray-100 bg-gray-50">
-            <div className="flex justify-between items-center mb-2">
-              <div className="h-4 w-36 rounded bg-gray-200 animate-pulse" />
-              <div className="h-3 w-24 rounded bg-gray-200 animate-pulse" />
+    <div className="hidden md:block md:w-[280px] lg:w-[320px] xl:w-[380px] 2xl:w-[500px] shrink-0 bg-surface md:overflow-hidden">
+      <div className="flex h-full flex-col gap-4 overflow-y-auto p-2">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="px-2 py-2">
+            <div className="flex space-x-2">
+              <div className="flex-1">
+                <div className="flex justify-between items-center mb-1">
+                  <div className="h-4 w-24 rounded bg-gray-300 animate-pulse" />
+                  <div className="h-3 w-20 rounded bg-gray-200 animate-pulse" />
+                </div>
+                <div className="rounded p-3 border border-gray-200 bg-gray-50">
+                  <div className="space-y-2">
+                    <div className="h-3 w-full rounded bg-gray-200 animate-pulse" />
+                    <div className="h-3 w-5/6 rounded bg-gray-200 animate-pulse" />
+                    <div className="h-3 w-4/6 rounded bg-gray-200 animate-pulse" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="h-3 w-full rounded bg-gray-200 animate-pulse mb-2" />
-            <div className="h-3 w-5/6 rounded bg-gray-200 animate-pulse" />
           </div>
         ))}
       </div>
@@ -53,43 +66,42 @@ export default function App() {
         console.error("Error fetching data:", err);
       }
     }
+
     fetchData();
+    const interval = setInterval(fetchData, 3 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const loading = !performanceData || !invocationsData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900 flex flex-col items-center px-6 py-10 font-[system-ui]">
-      <header className="w-full max-w-7xl mb-6">
-        <h1 className="text-4xl font-semibold tracking-tight text-gray-800">Performance Overview</h1>
-        <p className="text-sm text-gray-500 mt-1">Realtime portfolio & invocation snapshot</p>
-      </header>
-
-      {loading && (
-        <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <ChartSkeleton />
-          <ListSkeleton />
-        </div>
-      )}
-
-      {!loading && (
-        <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8 transition-all duration-500">
-          <div className="lg:col-span-2 bg-white shadow-sm rounded-3xl p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <h2 className="text-xl font-medium mb-4 text-gray-700">Performance Metrics</h2>
+    <div className="h-screen flex flex-col overflow-hidden bg-linear-to-b from-gray-50 to-gray-100 text-gray-900 font-[system-ui]">
+      <Navbar />
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row overflow-y-auto md:overflow-hidden">
+        {loading ? (
+          <>
+            <ChartSkeleton />
+            <ListSkeleton />
+          </>
+        ) : (
+          <>
             <PerformanceChart data={performanceData} />
-          </div>
-
-          <div className="bg-white shadow-sm rounded-3xl p-6 border border-gray-100 hover:shadow-md transition-shadow">
-            <h2 className="text-xl font-medium mb-4 text-gray-700">Recent Invocations</h2>
             <RecentInvocations data={invocationsData} />
-          </div>
-        </div>
-      )}
-
+          </>
+        )}
+      </div>
       {lastUpdated && (
-        <div className="mt-8 text-sm text-gray-500">
+        <div className="py-2 text-sm text-center text-gray-500 border-t-2 border-black">
           Last updated:{" "}
-          <span className="font-medium text-gray-700">{new Date(lastUpdated).toLocaleString()}</span>
+          <span className="font-medium text-gray-700">
+            {new Date(lastUpdated).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
         </div>
       )}
     </div>
