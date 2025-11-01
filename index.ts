@@ -128,3 +128,5 @@ async function main() {
 setInterval(() => {
     main()
 }, 1000 * 60 * 5);
+
+main()
