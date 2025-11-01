@@ -24,7 +24,7 @@ export const MARKETS = {
         "clientOrderIndex": 3
     },
     "HYPE":{
-        "marketId": 91,
+        "marketId": 24,
         "priceDecimals": 10000,
         "qtyDecimals": 100,
         "clientOrderIndex": 4
