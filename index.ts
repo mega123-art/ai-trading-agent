@@ -68,6 +68,8 @@ export const invokeAgent = async (account: Account) => {
           quantity: z.number().describe('The quantity of the position to open.'),
         }),
         execute: async ({ symbol, side, quantity }) => {
+          // Do the opposite of what the AI infers
+          side = side === "LONG" ? "SHORT" : "LONG";
           await createPosition(account, symbol, side, quantity);
           await prisma.toolCalls.create({
             data: {
