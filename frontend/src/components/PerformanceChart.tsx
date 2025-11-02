@@ -1,12 +1,21 @@
 import { useMemo } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer, ReferenceLine } from "recharts";
 
-const COLORS = [
-  "#3366CC", "#DC3912", "#FF9900", "#109618", "#990099",
-  "#0099C6", "#DD4477", "#66AA00", "#B82E2E", "#316395",
-  "#994499", "#22AA99", "#AAAA11", "#6633CC", "#E67300",
-  "#8B0707", "#651067", "#329262", "#5574A6", "#3B3EAC",
-];
+// Map model names to specific colors
+const getModelColor = (modelName: string) => {
+  const lowerName = modelName.toLowerCase();
+
+  if (lowerName.includes('claude')) {
+    return '#ff6b35';  // claude - orange
+  } else if (lowerName.includes('deepseek')) {
+    return '#4d6bfe';  // deepseek - blue
+  } else if (lowerName.includes('qwen')) {
+    return '#8b5cf6';  // qwen - purple
+  }
+
+  // Fallback for unknown models
+  return '#6b7280';  // gray
+};
 
 type Props = { data: any[] };
 
@@ -61,40 +70,84 @@ export default function PerformanceChart({ data }: Props) {
   }, [data]);
 
   return (
-    <div className="w-full h-[56vh] max-w-[1200px]">
-      <LineChart
-        data={chartData}
-        width={1200}
-        height={600}
-        margin={{ top: 8, right: 24, bottom: 8, left: 0 }}
-        className="w-full h-full"
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="t"
-          type="number"
-          domain={["auto", "auto"]}
-          tickFormatter={(v: number) => new Date(v).toLocaleTimeString()}
-          tick={{ fontSize: 12 }}
-        />
-        <YAxis tick={{ fontSize: 12 }} domain={[600, 1500]} ticks={[600, 1000, 1500]} />
-        <Tooltip labelFormatter={(label: any) => new Date(label).toLocaleString()} />
-        <Legend />
-        {seriesNames.map((name, idx) => (
-          <Line
-            key={name}
-            type="basis"
-            dataKey={name}
-            dot={false}
-            strokeWidth={2}
-            stroke={COLORS[idx % COLORS.length]}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            isAnimationActive={false}
-            connectNulls
+    <div className="relative w-full flex flex-1 border-r-2 border-black">
+      {/* Title */}
+      <div className="absolute left-1/2 top-2 -translate-x-1/2 z-10">
+        <h2 className="text-sm font-bold text-black font-mono">TOTAL ACCOUNT VALUE</h2>
+      </div>
+
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={chartData}
+          margin={{ top: 40, right: 80, bottom: 0, left: 20 }}
+        >
+          <CartesianGrid
+            strokeDasharray="1,3"
+            stroke="rgba(0, 0, 0, 0.1)"
+            strokeWidth={0.5}
           />
-        ))}
-      </LineChart>
+
+          <XAxis
+            dataKey="t"
+            type="number"
+            domain={["auto", "auto"]}
+            tickFormatter={(v: number) => {
+              const date = new Date(v);
+              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }}
+            tick={{ fontSize: 12, fontFamily: 'monospace', fontWeight: 600, fill: 'rgba(0, 0, 0, 0.8)' }}
+            stroke="rgba(0, 0, 0, 0.4)"
+            strokeWidth={1.5}
+          />
+
+          <YAxis
+            tick={{ fontSize: 12, fontFamily: 'Courier New, monospace', fontWeight: 600, fill: 'rgba(0, 0, 0, 0.8)' }}
+            tickFormatter={(v: number) => `$${v.toLocaleString()}`}
+            ticks={[500, 1000, 1500]}
+            stroke="rgba(0, 0, 0, 0.4)"
+            strokeWidth={1.5}
+          />
+
+          <Tooltip
+            labelFormatter={(label: any) => new Date(label).toLocaleString()}
+            contentStyle={{
+              backgroundColor: 'white',
+              border: '2px solid black',
+              fontFamily: 'monospace',
+              fontSize: '12px'
+            }}
+          />
+
+          <Legend
+            wrapperStyle={{
+              fontFamily: 'monospace',
+              fontSize: '12px'
+            }}
+          />
+
+          <ReferenceLine
+            y={1000}
+            stroke="rgba(0, 0, 0, 0.3)"
+            strokeWidth={2}
+            strokeDasharray="5 5"
+          />
+
+          {seriesNames.map((name) => (
+            <Line
+              key={name}
+              type="monotone"
+              dataKey={name}
+              dot={false}
+              strokeWidth={2}
+              stroke={getModelColor(name)}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              isAnimationActive={false}
+              connectNulls
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }
